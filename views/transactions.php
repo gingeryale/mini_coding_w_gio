@@ -34,7 +34,16 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- YOUR CODE -->
+            <?php if(!empty($merged_transactions)): ?>
+            <?php foreach($merged_transactions as $transaction) : ?>
+                <tr>
+                    <td><?= $transaction[0]?></td>
+                    <td><?= $transaction[1]?></td>
+                    <td><?= $transaction[2]?></td>
+                    <td><?= $transaction[3]?></td>
+                </tr>
+            <?php endforeach; ?>
+        <?php endif; ?>
             </tbody>
             <tfoot>
                 <tr>
