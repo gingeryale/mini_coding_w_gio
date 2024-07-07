@@ -17,6 +17,22 @@ function getTransactionFiles(string $dirPath): array
     return $files;
 }
 
+
+function parseDataRow(array $transactionRow): array
+{
+    // array destructuring - strip away symbols from $amount
+    [$date, $checkNumber, $description,$amount] = $transactionRow;
+
+    $amount = (float) str_replace(['$',','], '', $amount);
+    return [
+        'date' => $date,
+        'checkNumber' => $checkNumber,
+        'description' => $description,
+        'amount' => $amount,
+    ];
+}
+
+
 function getTransactions(string $filename): array
 {
     if(!file_exists($filename))
@@ -31,22 +47,33 @@ function getTransactions(string $filename): array
 
     while(($transaction = fgetcsv($file)) !== false)
     {
-        $transactions[] = $transaction;
+        $transactions[] = parseDataRow($transaction);
     }
 
     return $transactions;
 }
 
-function ParseDataRow(string $transactionRow): array
+function calcTotals(array $transactions): array
 {
-    // array destructuring - strip away symbols from $amount
-    [$date, $checkNumber, $description,$amount] = $transactionRow;
-
-    $amount = (float) str_replace(['$',','], '', $amount);
-    return [
-        'date' => $date,
-        'checkNumber' => $checkNumber,
-        'decsription' => $description,
-        'amount' => $amount,
+    $totals = [
+        'netTotal' =>0,
+        'totalIncome'=>0,
+        'totalExpense'=>0
     ];
+
+    foreach($transactions as $transact)
+    {
+        $totals['netTotal']+=$transact['amount'];
+
+        if($transact['amount'] >= 0)
+        {
+            $totals['totalIncome'] += $transact['amount'];
+        }
+        else
+        {
+            $totals['totalExpense'] += $transact['amount'];
+        }
+    }
+
+    return $totals;
 }
